@@ -39,6 +39,7 @@ jobs:
             echo "no-deploy=true" >> $GITHUB_ENV
           else
             echo "no-deploy=false" >> $GITHUB_ENV
+          fi
 
       - name: Deploy Delta Metadata
         if: env.no-deploy == 'false'
