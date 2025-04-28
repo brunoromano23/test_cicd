@@ -20,8 +20,8 @@ jobs:
       - name: Install sfpowerkit plugin
         run: |
           echo "Installing sfpowerkit..."
-          sfdx plugins:install sfpowerkit
-          echo "Installed plugins list:"
+          echo "y" | sfdx plugins:install sfpowerkit
+          echo "Installed plugins:"
           sfdx plugins --core
 
       - name: Authenticate to Salesforce (JWT)
