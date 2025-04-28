@@ -34,6 +34,12 @@ jobs:
                 cp "$file" "delta/$file"
               done
 
+      - name: Show Delta Files Copied
+        run: |
+          echo "====== Delta Files Copied ======"
+          ls -R delta
+
+
       - name: Convert Delta Source to Metadata API Format
         run: |
             if [ -d "delta/force-app" ] && [ "$(ls -A delta/force-app)" ]; then
@@ -42,6 +48,11 @@ jobs:
               echo "No files to convert. Skipping conversion."
               mkdir -p converted-delta  # Create empty folder to avoid deployment crash
             fi
+
+      - name: Show Converted Metadata for Deployment
+        run: |
+          echo "====== Converted Metadata ======"
+          ls -R converted-delta
 
       - name: Check if Delta Package Exists
         id: delta-check
