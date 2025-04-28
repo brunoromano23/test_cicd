@@ -23,11 +23,10 @@ jobs:
       - name: Authenticate to Salesforce (JWT)
         run: |
           echo "${{ secrets.SF_JWT_KEY }}" > server.key
-          sfdx auth:jwt:grant --client-id 3MVG9dZJodJWITSuB5CFu69a8IIeQ6aPCc6M34dCGvS1GNQavfKPaVxjybKxS4xU0xSO_OhTerBCRhbLedxCE \
+          sfdx force:auth:jwt:grant --client-id 3MVG9dZJodJWITSuB5CFu69a8IIeQ6aPCc6M34dCGvS1GNQavfKPaVxjybKxS4xU0xSO_OhTerBCRhbLedxCE \
                            --jwt-key-file server.key \
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
-                           --setdefaultusername
 
       - name: Generate Delta Package
         run: |
