@@ -28,15 +28,20 @@ jobs:
 
       - name: Generate Delta Folder
         run: |
-          mkdir -p delta
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' | while read file; do
-            mkdir -p "delta/$(dirname "$file")"
-            cp "$file" "delta/$file"
-          done
+              mkdir -p delta
+              git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' | while read file; do
+                mkdir -p "delta/$(dirname "$file")"
+                cp "$file" "delta/$file"
+              done
 
       - name: Convert Delta Source to Metadata API Format
         run: |
-          sf project convert source --root-dir delta/force-app --output-dir converted-delta
+            if [ -d "delta/force-app" ] && [ "$(ls -A delta/force-app)" ]; then
+              sf project convert source --root-dir delta/force-app --output-dir converted-delta
+            else
+              echo "No files to convert. Skipping conversion."
+              mkdir -p converted-delta  # Create empty folder to avoid deployment crash
+            fi
 
       - name: Check if Delta Package Exists
         id: delta-check
