@@ -25,7 +25,8 @@ jobs:
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
 
       - name: Convert Source to Metadata API Format
-        run: sf project convert source --root-dir force-app --output-dir deploy-mdapi
+        run: |
+          sf project convert source --root-dir force-app --output-dir deploy-mdapi
 
       - name: Validate Deployment (Pre-Check)
         run: sf deploy metadata validate --target-org sandbox --metadata-dir deploy-mdapi --wait 10 --test-level RunLocalTests
