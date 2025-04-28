@@ -24,15 +24,22 @@ jobs:
                            --username bruno.romano182@gmail.com.treinamento \
                            --instanceurl https://brunoromano23-dev-ed.my.salesforce.com
 
-      - name: Generate Delta Package
+      - name: Generate Delta Folder
         run: |
-            npm install --global sfdx-git-delta
-            npx sfdx-git-delta generate:delta --to HEAD --from ${{ github.event.before }} --output delta
+          mkdir -p delta
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' | while read file; do
+            mkdir -p "delta/$(dirname "$file")"
+            cp "$file" "delta/$file"
+          done
+
+      - name: Convert Delta Source to Metadata API Format
+        run: |
+          sf project convert source --root-dir delta/force-app --output-dir converted-delta
 
       - name: Check if Delta Package Exists
         id: delta-check
         run: |
-          if [ ! -s "delta/package.xml" ]; then
+          if [ ! -d "converted-delta" ] || [ -z "$(ls -A converted-delta)" ]; then
             echo "no-deploy=true" >> $GITHUB_ENV
           else
             echo "no-deploy=false" >> $GITHUB_ENV
@@ -41,5 +48,5 @@ jobs:
       - name: Deploy Delta Metadata
         if: env.no-deploy == 'false'
         run: |
-            sf deploy metadata --target-org bruno.romano182@gmail.com.treinamento --metadata-dir delta/package --manifest delta/package.xml --wait 10
+            sf deploy metadata --target-org bruno.romano182@gmail.com.treinamento --metadata-dir converted-delta --wait 10
 
