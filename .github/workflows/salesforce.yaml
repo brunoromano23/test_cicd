@@ -26,13 +26,21 @@ jobs:
                            --username bruno.romano182@gmail.com.treinamento \
                            --instanceurl https://brunoromano23-dev-ed.my.salesforce.com
 
-      - name: Generate Delta Folder
+      - name: Generate Delta Folder (including -meta.xml)
         run: |
-              mkdir -p delta
-              git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' | while read file; do
-                mkdir -p "delta/$(dirname "$file")"
-                cp "$file" "delta/$file"
-              done
+          mkdir -p delta
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' | while read file; do
+            mkdir -p "delta/$(dirname "$file")"
+            cp "$file" "delta/$file"
+            # Copy related -meta.xml file if needed
+            if [[ "$file" =~ \.(cls|trigger|page|component)$ ]]; then
+              meta_file="${file}-meta.xml"
+              if [ -f "$meta_file" ]; then
+                mkdir -p "delta/$(dirname "$meta_file")"
+                cp "$meta_file" "delta/$meta_file"
+              fi
+            fi
+          done
 
       - name: Show Delta Files Copied
         run: |
