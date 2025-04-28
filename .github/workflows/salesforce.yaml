@@ -28,7 +28,15 @@ jobs:
 
       - name: Generate Delta Package
         run: |
-          sfdy-delta generate:delta --to "HEAD" --from "${{ github.event.before }}" --output "delta"
+            sfdx-git-delta generate:delta --to "HEAD" --from "${{ github.event.before }}" --output "delta"
+
+      - name: Check if Delta Package Exists
+        id: delta-check
+        run: |
+          if [ ! -s "delta/package.xml" ]; then
+            echo "no-deploy=true" >> $GITHUB_ENV
+          else
+            echo "no-deploy=false" >> $GITHUB_ENV
 
       - name: Deploy Delta Metadata
         run: |
