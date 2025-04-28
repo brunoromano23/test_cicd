@@ -1,4 +1,4 @@
-name: CI/CD Deploy to Salesforce Sandbox
+name: CI/CD Delta Deploy with sfdx-git-delta
 
 on:
   push:
@@ -13,8 +13,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Salesforce CLI
-        run: npm install --global @salesforce/cli
+      - name: Install Salesforce CLI and sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli
+          npm install --global sfdx-git-delta
 
       - name: Authenticate to Salesforce (JWT)
         run: |
@@ -24,21 +26,10 @@ jobs:
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
 
-      - name: Get Changed Metadata
-        id: changed-files
+      - name: Generate Delta Package
         run: |
-          echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^force-app/' || true)" >> $GITHUB_ENV
-      
-      - name: Prepare Deployment Folder
+          sfdy-delta generate:delta --to "HEAD" --from "${{ github.event.before }}" --output "delta"
+
+      - name: Deploy Delta Metadata
         run: |
-          mkdir -p deploy-changed
-          for file in $CHANGED_FILES; do
-            mkdir -p deploy-changed/$(dirname "$file")
-            cp "$file" deploy-changed/"$file"
-          done
-
-      - name: Convert Changed Source to Metadata API Format
-        run: sf project convert source --root-dir deploy-changed --output-dir deploy-mdapi
-
-      - name: Deploy Changed Metadata
-        run: sf deploy metadata --target-org bruno.romano182@gmail.com.treinamento --metadata-dir deploy-mdapi --wait 10
+          sf deploy metadata --target-org bruno.romano182@gmail.com.treinamento --metadata-dir delta/package --manifest delta/package.xml --wait 10 --test-level RunLocalTests
