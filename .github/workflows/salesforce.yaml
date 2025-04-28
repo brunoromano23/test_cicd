@@ -16,7 +16,9 @@ jobs:
       - name: Install Salesforce CLI and sfdx-git-delta
         run: |
           npm install --global sfdx-cli
-          sfdx plugins:install sfpowerkit
+
+      - name: Install sfpowerkit plugin
+        run: sfdx plugins:install sfpowerkit
 
       - name: Authenticate to Salesforce (JWT)
         run: |
@@ -25,6 +27,7 @@ jobs:
                            --jwt-key-file server.key \
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
+                           --setdefaultusername
 
       - name: Generate Delta Package
         run: |
