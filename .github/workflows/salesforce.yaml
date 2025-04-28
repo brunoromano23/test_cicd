@@ -18,7 +18,11 @@ jobs:
           npm install --global sfdx-cli
 
       - name: Install sfpowerkit plugin
-        run: sfdx plugins:install sfpowerkit
+        run: |
+          echo "Installing sfpowerkit..."
+          sfdx plugins:install sfpowerkit
+          echo "Installed plugins list:"
+          sfdx plugins --core
 
       - name: Authenticate to Salesforce (JWT)
         run: |
