@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate Delta Package
         run: |
-          sfdx sfpowerkit:source:delta source delta --to HEAD --from ${{ github.event.before }} --output delta
+          sfdx sfpowerkit:source:delta --to HEAD --from ${{ github.event.before }} --output delta
 
       - name: Check if Delta Package Exists
         id: delta-check
