@@ -25,7 +25,6 @@ jobs:
                            --jwt-key-file server.key \
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
-                           --setdefaultusername
 
       - name: Generate Delta Package
         run: |
