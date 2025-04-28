@@ -16,20 +16,21 @@ jobs:
       - name: Install Salesforce CLI
         run: npm install --global @salesforce/cli
 
-      - name: Authenticate to Salesforce Sandbox (JWT)
+      - name: Authenticate to Salesforce (JWT)
         run: |
           echo "${{ secrets.SF_JWT_KEY }}" > server.key
           sf org login jwt --client-id 3MVG9dZJodJWITSuB5CFu69a8IIeQ6aPCc6M34dCGvS1GNQavfKPaVxjybKxS4xU0xSO_OhTerBCRhbLedxCE \
                            --jwt-key-file server.key \
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
+                           --setalias sf_org
 
       - name: Convert Source to Metadata API Format
         run: |
           sf project convert source --root-dir force-app --output-dir deploy-mdapi
 
       - name: Validate Deployment (Pre-Check)
-        run: sf deploy metadata validate --target-org sandbox --metadata-dir deploy-mdapi --wait 10 --test-level RunLocalTests
+        run: sf deploy metadata validate --target-org sf_org --metadata-dir deploy-mdapi --wait 10 --test-level RunLocalTests
 
-      - name: Deploy to Sandbox
-        run: sf deploy metadata --target-org sandbox --metadata-dir deploy-mdapi --wait 10 --test-level RunLocalTests
+      - name: Deploy to Org
+        run: sf deploy metadata --target-org sf_org --metadata-dir deploy-mdapi --wait 10 --test-level RunLocalTests
