@@ -15,20 +15,21 @@ jobs:
 
       - name: Install Salesforce CLI and sfdx-git-delta
         run: |
-          npm install --global @salesforce/cli
-          sf plugins install sfpowerkit
+          npm install --global sfdx-cli
+          sfdx plugins:install sfpowerkit
 
       - name: Authenticate to Salesforce (JWT)
         run: |
           echo "${{ secrets.SF_JWT_KEY }}" > server.key
-          sf org login jwt --client-id 3MVG9dZJodJWITSuB5CFu69a8IIeQ6aPCc6M34dCGvS1GNQavfKPaVxjybKxS4xU0xSO_OhTerBCRhbLedxCE \
+          sfdx auth:jwt:grant --client-id 3MVG9dZJodJWITSuB5CFu69a8IIeQ6aPCc6M34dCGvS1GNQavfKPaVxjybKxS4xU0xSO_OhTerBCRhbLedxCE \
                            --jwt-key-file server.key \
                            --username bruno.romano182@gmail.com.treinamento \
                            --instance-url https://brunoromano23-dev-ed.my.salesforce.com
+                           --setdefaultusername
 
       - name: Generate Delta Package
         run: |
-          sf sfpowerkit source delta --to HEAD --from ${{ github.event.before }} --output delta
+          sfdx sfpowerkit:source:delta source delta --to HEAD --from ${{ github.event.before }} --output delta
 
       - name: Check if Delta Package Exists
         id: delta-check
@@ -41,4 +42,4 @@ jobs:
       - name: Deploy Delta Metadata
         if: env.no-deploy == 'false'
         run: |
-          sf deploy metadata --target-org bruno.romano182@gmail.com.treinamento --metadata-dir delta/package --manifest delta/package.xml --wait 10
+          sfdx force:source:deploy -x delta/package.xml --wait 10 --testlevel RunLocalTests
